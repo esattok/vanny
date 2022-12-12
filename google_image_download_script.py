@@ -24,12 +24,12 @@ while True:
         break
     last_height = new_height
 
-for i in range(1, 50):
+for i in range(1, 700):
     try:
         imageXpathSelector=f'//*[@id="islrg"]/div[1]/div[{i}]/a[1]/div[1]/img'
         img=driver.find_element("xpath", imageXpathSelector)
         src=(img.get_attribute('src'))
-        urllib.request.urlretrieve(src, f'C:\\Users\\Elifnur\\Desktop\\babies\\{word} ('+str(i)+').jpg')
+        urllib.request.urlretrieve(src, f'/Users/personal/Desktop/Senior Design Project/datasets/{word}/{word} ('+str(i)+').jpg')
     except Exception:
         pass
     
