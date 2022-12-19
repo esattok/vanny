@@ -3,6 +3,7 @@ warnings.filterwarnings("ignore")
 
 from tflite_model_maker import model_spec
 from tflite_model_maker import object_detector
+import tensorflow as tf
 
 import config
 
@@ -14,20 +15,22 @@ MODEL_PATH = config.MODEL_PATH
 TRAIN_DATASET_PATH = config.TRAIN_DATASET_PATH
 VALID_DATASET_PATH = config.VALID_DATASET_PATH
 MODEL = config.MODEL
-
+print(TRAIN_DATASET_PATH)
 train_data = object_detector.DataLoader.from_pascal_voc(
     TRAIN_DATASET_PATH,
     TRAIN_DATASET_PATH,
     CLASSES
 )
-
+print("checkpoint_1")
 val_data = object_detector.DataLoader.from_pascal_voc(
     VALID_DATASET_PATH,
     VALID_DATASET_PATH,
     CLASSES
 )
+print("checkpoint_2")
 
 spec = model_spec.get(MODEL)
+print("checkpoint_3")
 
 model = object_detector.create(
     train_data,
@@ -37,6 +40,7 @@ model = object_detector.create(
     epochs=EPOCHS,
     validation_data=val_data
 )
+print("checkpoint_4")
 
 model.evaluate(val_data)
 

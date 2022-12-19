@@ -8,13 +8,13 @@ if not os.path.exists('model'):
 if not os.path.exists(f'{cwd}/result'):
     os.mkdir(f'{cwd}/result')
 
-TRAIN_DATASET_PATH = f'{cwd}/dataset/train'
-VALID_DATASET_PATH = f'{cwd}/dataset/valid'
-TEST_DATASET_PATH = f'{cwd}/dataset/test'
-MODEL_PATH = f'{cwd}/model'
+TRAIN_DATASET_PATH = f'{cwd}/object_detection/dataset/train'
+VALID_DATASET_PATH = f'{cwd}/object_detection/dataset/valid'
+TEST_DATASET_PATH = f'{cwd}/object_detection/dataset/test'
+MODEL_PATH = f'{cwd}/object_detection/model'
 
 MODEL = 'efficientdet_lite0'
-MODEL_NAME = 'model.tflite'
+MODEL_NAME = 'baby.tflite'
 CLASSES = ['baby']
 EPOCHS = 20
 BATCH_SIZE = 4
