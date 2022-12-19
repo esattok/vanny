@@ -5,8 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#3C3C3C"
-    android:gravity="right"
-
     tools:context=".CameraPage">
 
 
@@ -19,6 +17,28 @@
         android:backgroundTint="#3C3C3C"
         android:layout_margin="30dp"
         style="?android:attr/borderlessButtonStyle"
+        android:layout_alignParentRight="true"
+
         />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/pairBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_gravity="center_vertical"
+        android:backgroundTint="#F5F5F5"
+        android:letterSpacing="0.05"
+        android:paddingLeft="50dp"
+        android:paddingTop="10dp"
+        android:paddingRight="50dp"
+        android:paddingBottom="10dp"
+        android:text="Pair with Device"
+        android:textAllCaps="false"
+        android:textColor="#3C3C3C"
+        android:textFontWeight="600"
+        android:textSize="14dp"
+        app:cornerRadius="50px"
+        app:fontFamily="@font/mallana" />
 
 </RelativeLayout>
