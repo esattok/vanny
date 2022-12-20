@@ -1,0 +1,213 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.example.vanny"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="21"
+8-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml
+9        android:targetSdkVersion="32" />
+9-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml
+10
+11    <application
+11-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:5:5-98:19
+12        android:allowBackup="true"
+12-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:6:9-35
+13        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+13-->[androidx.core:core:1.8.0] C:\Users\wsmga\.gradle\caches\transforms-3\87a796fe63836d99a2198ac6a6284cb3\transformed\core-1.8.0\AndroidManifest.xml:24:18-86
+14        android:dataExtractionRules="@xml/data_extraction_rules"
+14-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:7:9-65
+15        android:debuggable="true"
+16        android:fullBackupContent="@xml/backup_rules"
+16-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:8:9-54
+17        android:icon="@mipmap/ic_launcher"
+17-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:9:9-43
+18        android:label="@string/app_name"
+18-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:10:9-41
+19        android:roundIcon="@mipmap/ic_launcher_round"
+19-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:11:9-54
+20        android:supportsRtl="true"
+20-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:12:9-35
+21        android:testOnly="true"
+22        android:theme="@style/Theme.Vanny" >
+22-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:13:9-43
+23        <activity
+23-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:15:9-21:20
+24            android:name="com.example.vanny.AudioPage"
+24-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:16:13-38
+25            android:exported="false" >
+25-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:17:13-37
+26            <meta-data
+26-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:18:13-20:36
+27                android:name="android.app.lib_name"
+27-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:19:17-52
+28                android:value="" />
+28-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:20:17-33
+29        </activity>
+30        <activity
+30-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:22:9-28:20
+31            android:name="com.example.vanny.ReportFile"
+31-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:23:13-39
+32            android:exported="false" >
+32-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:24:13-37
+33            <meta-data
+33-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:18:13-20:36
+34                android:name="android.app.lib_name"
+34-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:19:17-52
+35                android:value="" />
+35-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:20:17-33
+36        </activity>
+37        <activity
+37-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:29:9-35:20
+38            android:name="com.example.vanny.ReportPage"
+38-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:30:13-39
+39            android:exported="false" >
+39-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:31:13-37
+40            <meta-data
+40-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:18:13-20:36
+41                android:name="android.app.lib_name"
+41-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:19:17-52
+42                android:value="" />
+42-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:20:17-33
+43        </activity>
+44        <activity
+44-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:36:9-42:20
+45            android:name="com.example.vanny.VideoPage"
+45-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:37:13-38
+46            android:exported="false" >
+46-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:38:13-37
+47            <meta-data
+47-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:18:13-20:36
+48                android:name="android.app.lib_name"
+48-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:19:17-52
+49                android:value="" />
+49-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:20:17-33
+50        </activity>
+51        <activity
+51-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:43:9-49:20
+52            android:name="com.example.vanny.AlarmPage"
+52-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:44:13-38
+53            android:exported="false" >
+53-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:45:13-37
+54            <meta-data
+54-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:18:13-20:36
+55                android:name="android.app.lib_name"
+55-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:19:17-52
+56                android:value="" />
+56-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:20:17-33
+57        </activity>
+58        <activity
+58-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:50:9-56:20
+59            android:name="com.example.vanny.LullabyPage"
+59-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:51:13-40
+60            android:exported="false" >
+60-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:52:13-37
+61            <meta-data
+61-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:18:13-20:36
+62                android:name="android.app.lib_name"
+62-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:19:17-52
+63                android:value="" />
+63-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:20:17-33
+64        </activity>
+65        <activity
+65-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:57:9-63:20
+66            android:name="com.example.vanny.NotificationPage"
+66-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:58:13-45
+67            android:exported="false" >
+67-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:59:13-37
+68            <meta-data
+68-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:18:13-20:36
+69                android:name="android.app.lib_name"
+69-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:19:17-52
+70                android:value="" />
+70-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:20:17-33
+71        </activity>
+72        <activity
+72-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:64:9-70:20
+73            android:name="com.example.vanny.SettingsPage"
+73-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:65:13-41
+74            android:exported="false" >
+74-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:66:13-37
+75            <meta-data
+75-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:18:13-20:36
+76                android:name="android.app.lib_name"
+76-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:19:17-52
+77                android:value="" />
+77-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:20:17-33
+78        </activity>
+79        <activity
+79-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:71:9-77:20
+80            android:name="com.example.vanny.safetyPage"
+80-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:72:13-39
+81            android:exported="false" >
+81-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:73:13-37
+82            <meta-data
+82-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:18:13-20:36
+83                android:name="android.app.lib_name"
+83-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:19:17-52
+84                android:value="" />
+84-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:20:17-33
+85        </activity>
+86        <activity
+86-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:78:9-84:20
+87            android:name="com.example.vanny.CameraPage"
+87-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:79:13-39
+88            android:exported="false" >
+88-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:80:13-37
+89            <meta-data
+89-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:18:13-20:36
+90                android:name="android.app.lib_name"
+90-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:19:17-52
+91                android:value="" />
+91-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:20:17-33
+92        </activity>
+93        <activity
+93-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:85:9-97:20
+94            android:name="com.example.vanny.MainActivity"
+94-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:86:13-41
+95            android:exported="true" >
+95-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:87:13-36
+96            <intent-filter>
+96-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:88:13-92:29
+97                <action android:name="android.intent.action.MAIN" />
+97-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:89:17-69
+97-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:89:25-66
+98
+99                <category android:name="android.intent.category.LAUNCHER" />
+99-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:91:17-77
+99-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:91:27-74
+100            </intent-filter>
+101
+102            <meta-data
+102-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:18:13-20:36
+103                android:name="android.app.lib_name"
+103-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:19:17-52
+104                android:value="" />
+104-->C:\Users\wsmga\Vanny\app\src\main\AndroidManifest.xml:20:17-33
+105        </activity>
+106
+107        <provider
+107-->[androidx.emoji2:emoji2:1.2.0] C:\Users\wsmga\.gradle\caches\transforms-3\c03fa7bc00a04a375204b573f0966d9f\transformed\emoji2-1.2.0\AndroidManifest.xml:24:9-32:20
+108            android:name="androidx.startup.InitializationProvider"
+108-->[androidx.emoji2:emoji2:1.2.0] C:\Users\wsmga\.gradle\caches\transforms-3\c03fa7bc00a04a375204b573f0966d9f\transformed\emoji2-1.2.0\AndroidManifest.xml:25:13-67
+109            android:authorities="com.example.vanny.androidx-startup"
+109-->[androidx.emoji2:emoji2:1.2.0] C:\Users\wsmga\.gradle\caches\transforms-3\c03fa7bc00a04a375204b573f0966d9f\transformed\emoji2-1.2.0\AndroidManifest.xml:26:13-68
+110            android:exported="false" >
+110-->[androidx.emoji2:emoji2:1.2.0] C:\Users\wsmga\.gradle\caches\transforms-3\c03fa7bc00a04a375204b573f0966d9f\transformed\emoji2-1.2.0\AndroidManifest.xml:27:13-37
+111            <meta-data
+111-->[androidx.emoji2:emoji2:1.2.0] C:\Users\wsmga\.gradle\caches\transforms-3\c03fa7bc00a04a375204b573f0966d9f\transformed\emoji2-1.2.0\AndroidManifest.xml:29:13-31:52
+112                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+112-->[androidx.emoji2:emoji2:1.2.0] C:\Users\wsmga\.gradle\caches\transforms-3\c03fa7bc00a04a375204b573f0966d9f\transformed\emoji2-1.2.0\AndroidManifest.xml:30:17-75
+113                android:value="androidx.startup" />
+113-->[androidx.emoji2:emoji2:1.2.0] C:\Users\wsmga\.gradle\caches\transforms-3\c03fa7bc00a04a375204b573f0966d9f\transformed\emoji2-1.2.0\AndroidManifest.xml:31:17-49
+114            <meta-data
+114-->[androidx.lifecycle:lifecycle-process:2.4.1] C:\Users\wsmga\.gradle\caches\transforms-3\0ce9e5f033589fdf0ab757f82f7808ec\transformed\lifecycle-process-2.4.1\AndroidManifest.xml:31:13-33:52
+115                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+115-->[androidx.lifecycle:lifecycle-process:2.4.1] C:\Users\wsmga\.gradle\caches\transforms-3\0ce9e5f033589fdf0ab757f82f7808ec\transformed\lifecycle-process-2.4.1\AndroidManifest.xml:32:17-78
+116                android:value="androidx.startup" />
+116-->[androidx.lifecycle:lifecycle-process:2.4.1] C:\Users\wsmga\.gradle\caches\transforms-3\0ce9e5f033589fdf0ab757f82f7808ec\transformed\lifecycle-process-2.4.1\AndroidManifest.xml:33:17-49
+117        </provider>
+118    </application>
+119
+120</manifest>
