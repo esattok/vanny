@@ -31,18 +31,20 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/videoOne"
-        android:layout_below="@id/videoText"
         android:layout_width="match_parent"
         android:layout_height="100dp"
+        android:layout_below="@id/videoText"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="15dp"
         android:backgroundTint="#F5F5F6"
-        app:cornerRadius="50px"
-        android:layout_margin="15dp"
-        android:text=" Video2022_12_19 \n 9.54PM"
-        android:textColor="#3C3C3C"
-        android:fontFamily="@font/mallana"
-        android:textAlignment="textStart"
         android:drawableLeft="@drawable/ic_baseline_play_arrow_24"
         android:drawableTint="#3C3C3C"
-        />
+        android:fontFamily="@font/mallana"
+        android:text=" Video2022_12_19 \n 9.54PM"
+        android:textAlignment="textStart"
+        android:textColor="#3C3C3C"
+        app:cornerRadius="50px" />
 
 </RelativeLayout>

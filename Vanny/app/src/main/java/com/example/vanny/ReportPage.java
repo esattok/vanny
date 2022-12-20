@@ -10,7 +10,6 @@ import android.widget.ImageButton;
 
 public class ReportPage extends AppCompatActivity {
     private ImageButton backBtn;
-    private Button reportFileBtn;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,13 +23,6 @@ public class ReportPage extends AppCompatActivity {
             }
         });
 
-        reportFileBtn = (Button) findViewById(R.id.reportOne);
-        reportFileBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                openActivity3();
-            }
-        });
     }
 
     public void openActivity2(){
@@ -38,8 +30,4 @@ public class ReportPage extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void openActivity3(){
-        Intent intent = new Intent(this, ReportFile.class);
-        startActivity(intent);
-    }
 }
