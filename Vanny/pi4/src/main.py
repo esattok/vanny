@@ -9,7 +9,7 @@ import cv2
 camera = picamera.PiCamera(resolution=(640, 480), framerate=30)
 
 # Load the TensorFlow Lite model
-interpreter = tflite_interpreter.Interpreter(model_path="model.tflite")
+interpreter = tflite_interpreter.Interpreter(model_path="lite-model_efficientdet_lite0_detection_metadata_1.tflite")
 interpreter.allocate_tensors()
 
 # Get the input and output tensors
@@ -47,20 +47,23 @@ def detect_objects(image):
 def draw_boxes(image, objects):
     # Get the dimensions of the image
     height, width, _ = image.shape
-    # Loop over the detected objects
+    # Loop over all detected objects
     for obj in objects:
-        # Get the coordinates of the box
-        ymin = int(obj['bounding_box']['ymin'] * height)
-        xmin = int(obj['bounding_box']['xmin'] * width)
-        ymax = int(obj['bounding_box']['ymax'] * height)
-        xmax = int(obj['bounding_box']['xmax'] * width)
-        # Draw the box on the image
+        # Get the class id and bounding box coordinates
+        class_id = int(obj[1])
+        ymin, xmin, ymax, xmax = obj
+        # Scale the bounding box coordinates to the image size
+        xmin = int(xmin * width)
+        xmax = int(xmax * width)
+        ymin = int(ymin * height)
+        ymax = int(ymax * height)
+        # Draw the bounding box on the image
         cv2.rectangle(image, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
-    # Return the image with the boxes drawn
+    # Return the image with the bounding boxes
     return image
 
 # Start the camera preview
-camera.start_preview()
+#camera.start_preview()
 
 # Continuously capture images and detect objects
 while True:
@@ -75,7 +78,8 @@ while True:
     # Detect objects in the image
     objects = detect_objects(image)
     # Draw boxes around the detected objects
-    image_with_boxes = draw_boxes(image, objects)
+    print(objects)
+    image_with_boxes = draw_boxes(image, objects) 
     # Show the image with the boxes
     cv2.imshow('Object Detection', image_with_boxes)
     # Wait for a key press
