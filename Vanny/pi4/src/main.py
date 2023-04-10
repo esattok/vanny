@@ -2,6 +2,7 @@
 import picamera
 import numpy as np
 import tflite_runtime.interpreter as tflite_interpreter
+from io import BytesIO
 
 # Set the resolution and framerate of the camera
 camera = picamera.PiCamera(resolution=(640, 480), framerate=30)
@@ -46,8 +47,14 @@ camera.start_preview()
 
 # Continuously capture images and detect objects
 while True:
-    # Capture an image
-    image = camera.capture()
+    # Create a BytesIO object to store the captured image
+    image_stream = BytesIO()
+    # Capture an image and store it in the BytesIO object
+    camera.capture(image_stream, format='jpeg')
+    # Convert the image data in the BytesIO object to a numpy array
+    image = np.frombuffer(image_stream.getvalue(), dtype=np.uint8)
+    # Decode the image as a JPEG image
+    image = cv2.imdecode(image, cv2.IMREAD_COLOR)
     # Detect objects in the image
     objects = detect_objects(image)
     # Print the detected objects
