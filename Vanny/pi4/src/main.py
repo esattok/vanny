@@ -1,13 +1,13 @@
 # Import the necessary libraries
 import picamera
 import numpy as np
-import tensorflow as tf
+import tflite_runtime.interpreter as tflite_interpreter
 
 # Set the resolution and framerate of the camera
 camera = picamera.PiCamera(resolution=(640, 480), framerate=30)
 
 # Load the TensorFlow Lite model
-interpreter = tf.lite.Interpreter(model_path="model.tflite")
+interpreter = tflite_interpreter.Interpreter(model_path="model.tflite")
 interpreter.allocate_tensors()
 
 # Get the input and output tensors
@@ -21,7 +21,7 @@ def preprocess(image):
     # Normalize the pixel values to be between 0 and 1
     image = image / 255.0
     # Resize the image to the input shape of the model
-    image = tf.image.resize(image, (input_details[0]['shape'][1], input_details[0]['shape'][2]))
+    image = np.resize(image, (input_details[0]['shape'][1], input_details[0]['shape'][2], input_details[0]['shape'][3]))
     # Add a batch dimension to the image
     image = np.expand_dims(image, axis=0)
     # Convert the image to the input data type of the model
