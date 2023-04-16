@@ -1,3 +1,5 @@
+from typing import List
+
 from vannypi.inputanalysis.objects.object import Object
 from vannypi.inputmanagement.videomanager.video import Video
 
@@ -8,7 +10,7 @@ from tflite_support.task import vision
 
 class ObjectsIdentifier:
     def __int__(self):
-        self._objects_to_look_for: list[Object] = []
+        self._objects_to_look_for: List[Object] = []
 
     @staticmethod
     def digest_models(model, num_threads, enable_edgetpu) -> core.BaseOptions:

@@ -1,3 +1,5 @@
+from typing import List
+
 from vannypi.communicator.reporter.report import Report
 from vannypi.inputmanagement.audiomanager.audio import Audio
 from vannypi.inputmanagement.videomanager.video import Video
@@ -8,6 +10,6 @@ class ReportGenerator:
         pass
 
     @staticmethod
-    def generate(videos: list[Video], audios: list[Audio], title: str, details: str) -> Report:
+    def generate(videos: List[Video], audios: List[Audio], title: str, details: str) -> Report:
         pass
    

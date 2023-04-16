@@ -1,3 +1,5 @@
+from typing import List
+
 from vannypi.inputanalysis.activityanalyzer.activity_analyzer import ActivityAnalyzer
 from vannypi.inputanalysis.environmentanalyzer.environment_analyzer import EnvironmentAnalyzer
 from vannypi.inputanalysis.environmentanalyzer.object_identifier import ObjectsIdentifier
@@ -12,7 +14,7 @@ class Watcher:
         self._identifier: ObjectsIdentifier = ObjectsIdentifier()
         self._environemnt_analyzer: EnvironmentAnalyzer = EnvironmentAnalyzer()
         self._activity_analyzer: ActivityAnalyzer = ActivityAnalyzer()
-        self._detected_objects: list[Object] = []
+        self._detected_objects: List[Object] = []
         self._pitch_analyzer: PitchAnalyzer = PitchAnalyzer()
 
     def watch(self) -> None:  # everything happens here

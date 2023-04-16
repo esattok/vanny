@@ -7,5 +7,5 @@ class VideoRecorder:
     def __int__(self):
         self._full_video: Video = Video()
 
-    def save_video(self, name: str, data: List[[float]]) -> Video:
+    def save_video(self, name: str, data: List[List[float]]) -> Video:
         pass

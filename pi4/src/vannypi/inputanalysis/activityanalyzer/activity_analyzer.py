@@ -1,3 +1,5 @@
+from typing import List
+
 from vannypi.communicator.reporter.report import Report
 from vannypi.inputanalysis.objects.object import Object
 
@@ -16,6 +18,6 @@ class ActivityAnalyzer:
     def generate_report(self) -> Report:
         pass
 
-    def _generate_details(self, objects: list[Object]) -> str:
+    def _generate_details(self, objects: List[Object]) -> str:
         pass
 
