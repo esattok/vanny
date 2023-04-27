@@ -1,3 +1,5 @@
+from typing import List
+
 import cv2
 import sys
 import time
@@ -62,7 +64,14 @@ class Camera:
         fps_avg_frame_count = 10
         # Variables to calculate FPS
         counter, fps = 0, 0
+        frames: List[np.ndarray] = []
+        length_of_record_seconds: int = 60
+        videos_count: int = 0
+        capture_starting_time = time.time()
         start_time = time.time()
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        video_writer = cv2.VideoWriter('capture_0.avi', fourcc, fps_avg_frame_count, (int(cap.get(3)), int(cap.get(4))))
+
         # Continuously capture images from the camera and run inference
         while cap.isOpened():
             success, image = cap.read()
@@ -73,6 +82,9 @@ class Camera:
 
             counter += 1
             image = cv2.flip(image, 1)
+            if len(frames) >= length_of_record_seconds * fps_avg_frame_count:
+                frames = frames[1:]
+            frames.append(image)
 
             # Convert the image from BGR to RGB as required by the TFLite model.
             rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -102,5 +114,35 @@ class Camera:
             if cv2.waitKey(1) == 27:
                 break
             cv2.imshow('object_detector', image)
+
+            if Camera.mock_event(seconds=80, start_time=capture_starting_time):
+                videos_count += 1
+                for i in range(len(frames)):
+                    video_writer.write(frames[i])
+                frames: List[np.ndarray] = []
+                capture_starting_time = time.time()
+                video_writer = cv2.VideoWriter('capture_{}.avi'.format(videos_count), fourcc, fps_avg_frame_count,
+                                               (int(cap.get(3)), int(cap.get(4))))
+
         cap.release()
         cv2.destroyAllWindows()
+
+    @staticmethod
+    def mock_event(seconds: int, start_time: float):
+        cur_time = time.time()
+        print(cur_time - start_time)
+        return cur_time - start_time > seconds
+
+
+'''
+pi code for camera
+camera = PiCamera()
+camera.resolution = (320, 240)
+camera.framerate = 24
+time.sleep(2)
+
+while True:
+    image = np.empty((240 * 320 * 3,), dtype=np.uint8)
+    camera.capture(image, 'bgr')
+    image = image.reshape((240, 320, 3))
+'''
