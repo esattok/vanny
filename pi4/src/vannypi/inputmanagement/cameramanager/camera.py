@@ -30,6 +30,9 @@ class Camera:
         _FONT_THICKNESS = 1
         _TEXT_COLOR = (0, 0, 255)  # red
 
+        # mocking danger detectionn with water bottles :)
+        bottle_detected: bool = False
+
         for detection in detection_result.detections:
             # Draw bounding_box
             bbox = detection.bounding_box
@@ -40,6 +43,8 @@ class Camera:
             # Draw label and score
             category = detection.categories[0]
             category_name = category.category_name
+            if category_name == "bottle":
+                bottle_detected = True
             probability = round(category.score, 2)
             result_text = category_name + ' (' + str(probability) + ')'
             text_location = (_MARGIN + bbox.origin_x,
@@ -47,7 +52,7 @@ class Camera:
             cv2.putText(image, result_text, text_location, cv2.FONT_HERSHEY_PLAIN,
                         _FONT_SIZE, _TEXT_COLOR, _FONT_THICKNESS)
 
-        return image
+        return image, bottle_detected  # this will change to be more organized
 
     @staticmethod
     def run_camera(detector, height, width, camera_id):
@@ -65,10 +70,14 @@ class Camera:
         # Variables to calculate FPS
         counter, fps = 0, 0
         frames: List[np.ndarray] = []
-        length_of_record_seconds: int = 60
+        min_length_of_record_seconds: int = 20
         videos_count: int = 0
         capture_starting_time = time.time()
         start_time = time.time()
+
+        # mocking danger detectionn with water bottles :)
+        bottle_detected: bool = False
+
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
         video_writer = cv2.VideoWriter('capture_0.avi', fourcc, fps_avg_frame_count, (int(cap.get(3)), int(cap.get(4))))
 
@@ -82,7 +91,8 @@ class Camera:
 
             counter += 1
             image = cv2.flip(image, 1)
-            if len(frames) >= length_of_record_seconds * fps_avg_frame_count:
+            # keep the size of video as intended
+            if len(frames) >= min_length_of_record_seconds * fps_avg_frame_count:
                 frames = frames[1:]
             frames.append(image)
 
@@ -96,7 +106,10 @@ class Camera:
             detection_result = detector.detect(input_tensor)
 
             # Draw keypoints and edges on input image
-            image = Camera.visualize(image, detection_result)
+            image, detected = Camera.visualize(image, detection_result)
+            if detected:
+                print("\ndetected")
+                bottle_detected = detected
 
             # Calculate the FPS
             if counter % fps_avg_frame_count == 0:
@@ -115,11 +128,16 @@ class Camera:
                 break
             cv2.imshow('object_detector', image)
 
-            if Camera.mock_event(seconds=80, start_time=capture_starting_time):
+            cur_time = time.time()
+            print(cur_time - capture_starting_time)
+
+            if bottle_detected and len(frames) >= min_length_of_record_seconds * fps_avg_frame_count:
+                print("writing")
                 videos_count += 1
                 for i in range(len(frames)):
                     video_writer.write(frames[i])
                 frames: List[np.ndarray] = []
+                bottle_detected = False
                 capture_starting_time = time.time()
                 video_writer = cv2.VideoWriter('capture_{}.avi'.format(videos_count), fourcc, fps_avg_frame_count,
                                                (int(cap.get(3)), int(cap.get(4))))
