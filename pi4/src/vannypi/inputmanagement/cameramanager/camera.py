@@ -68,18 +68,19 @@ class Camera:
         font_thickness = 1
         fps_avg_frame_count = 10
         # Variables to calculate FPS
-        counter, fps = 0, 0
+        counter, fps = 0, fps_avg_frame_count
         frames: List[np.ndarray] = []
-        min_length_of_record_seconds: int = 20
+
+        max_length_of_record_seconds: List[int] = [60, 30]
         videos_count: int = 0
         capture_starting_time = time.time()
         start_time = time.time()
-
+        mode: int = 0
+        capture_length = max_length_of_record_seconds[mode]
         # mocking danger detectionn with water bottles :)
         bottle_detected: bool = False
 
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        video_writer = cv2.VideoWriter('capture_0.avi', fourcc, fps_avg_frame_count, (int(cap.get(3)), int(cap.get(4))))
 
         # Continuously capture images from the camera and run inference
         while cap.isOpened():
@@ -92,7 +93,7 @@ class Camera:
             counter += 1
             image = cv2.flip(image, 1)
             # keep the size of video as intended
-            if len(frames) >= min_length_of_record_seconds * fps_avg_frame_count:
+            if len(frames) >= max_length_of_record_seconds[mode] * fps:
                 frames = frames[1:]
             frames.append(image)
 
@@ -131,16 +132,29 @@ class Camera:
             cur_time = time.time()
             print(cur_time - capture_starting_time)
 
-            if bottle_detected and len(frames) >= min_length_of_record_seconds * fps_avg_frame_count:
-                print("writing")
-                videos_count += 1
-                for i in range(len(frames)):
-                    video_writer.write(frames[i])
-                frames: List[np.ndarray] = []
-                bottle_detected = False
-                capture_starting_time = time.time()
-                video_writer = cv2.VideoWriter('capture_{}.avi'.format(videos_count), fourcc, fps_avg_frame_count,
-                                               (int(cap.get(3)), int(cap.get(4))))
+            if mode == 0:
+                if bottle_detected:
+                    print("writing")
+                    video_writer = cv2.VideoWriter('capture_{}.avi'.format(videos_count), fourcc, fps,
+                                                   (int(cap.get(3)), int(cap.get(4))))
+                    for i in range(len(frames)):
+                        video_writer.write(frames[i])
+                    frames: List[np.ndarray] = []
+                    mode = 1
+                    bottle_detected = False
+                    capture_starting_time = time.time()
+
+            elif mode == 1:
+                if len(frames) >= fps * max_length_of_record_seconds[mode]:
+                    print("writing post")
+                    print(len(frames))
+                    for i in range(len(frames)):
+                        video_writer.write(frames[i])
+                    frames: List[np.ndarray] = []
+                    mode = 0
+                    bottle_detected = False
+                    capture_starting_time = time.time()
+                    videos_count += 1
 
         cap.release()
         cv2.destroyAllWindows()
