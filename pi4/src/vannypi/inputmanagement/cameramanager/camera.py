@@ -1,3 +1,4 @@
+import wave
 from typing import List
 
 import cv2
@@ -174,7 +175,10 @@ class Camera:
                     print(len(frames))
                     for i in range(len(frames)):
                         video_writer.write(frames[i])
+                    waveFile.writeframes(b''.join(audio_frames))
+                    waveFile.close()
                     frames: List[np.ndarray] = []
+                    audio_frames: List[np.ndarray] = []
                     mode = 0
                     bottle_detected = False
                     capture_starting_time = time.time()
