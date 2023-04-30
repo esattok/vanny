@@ -71,6 +71,7 @@ class Camera:
         # Variables to calculate FPS
         counter, fps = 0, fps_avg_frame_count
         frames: List[np.ndarray] = []
+        audio_frames:  List[np.ndarray] = []
 
         max_length_of_record_seconds: List[int] = [60, 30]
         videos_count: int = 0
@@ -82,6 +83,14 @@ class Camera:
         bottle_detected: bool = False
 
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
+
+        p = pyaudio.PyAudio()
+        stream = p.open(format=pyaudio.paInt16,
+                        channels=1,
+                        rate=8000,
+                        input=True,
+                        frames_per_buffer=1024)
+
 
         # Continuously capture images from the camera and run inference
         while cap.isOpened():
@@ -96,10 +105,14 @@ class Camera:
             # keep the size of video as intended
             if len(frames) >= max_length_of_record_seconds[mode] * fps:
                 frames = frames[1:]
+                audio_frames = audio_frames[1:]
             frames.append(image)
+
 
             # Convert the image from BGR to RGB as required by the TFLite model.
             rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            audio_frame = stream.read(1024)
+            audio_frames.append(audio_frame)
 
             # Create a TensorImage object from the RGB image.
             input_tensor = vision.TensorImage.create_from_array(rgb_image)
@@ -138,9 +151,19 @@ class Camera:
                     print("writing")
                     video_writer = cv2.VideoWriter('capture_{}.avi'.format(videos_count), fourcc, fps,
                                                    (int(cap.get(3)), int(cap.get(4))))
+
+                    waveFile = wave.open('audio_capture_{}.wav'.format(videos_count), 'wb')
+                    waveFile.setnchannels(1)
+                    waveFile.setsampwidth(p.get_sample_size(pyaudio.paInt16))
+                    waveFile.setframerate(8000)
+
                     for i in range(len(frames)):
                         video_writer.write(frames[i])
+                    waveFile.writeframes(b''.join(audio_frames))
+
                     frames: List[np.ndarray] = []
+                    audio_frames: List[np.ndarray] = []
+
                     mode = 1
                     bottle_detected = False
                     capture_starting_time = time.time()
@@ -157,6 +180,9 @@ class Camera:
                     capture_starting_time = time.time()
                     videos_count += 1
 
+        stream.stop_stream()
+        stream.close()
+        p.terminate()
         cap.release()
         cv2.destroyAllWindows()
 
