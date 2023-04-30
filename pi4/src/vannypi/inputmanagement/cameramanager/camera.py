@@ -4,6 +4,7 @@ import cv2
 import sys
 import time
 
+import pyaudio # sudo apt-get install portaudio19-dev  python3-pyaudio
 from tflite_support.task import vision
 import numpy as np
 from tflite_support.task import processor
