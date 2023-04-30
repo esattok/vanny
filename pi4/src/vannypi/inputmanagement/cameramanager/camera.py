@@ -1,3 +1,4 @@
+import subprocess
 import wave
 from typing import List
 
@@ -5,7 +6,7 @@ import cv2
 import sys
 import time
 
-import pyaudio # sudo apt-get install portaudio19-dev  python3-pyaudio
+import pyaudio  # sudo apt-get install portaudio19-dev  python3-pyaudio
 from tflite_support.task import vision
 import numpy as np
 from tflite_support.task import processor
@@ -72,9 +73,9 @@ class Camera:
         # Variables to calculate FPS
         counter, fps = 0, fps_avg_frame_count
         frames: List[np.ndarray] = []
-        audio_frames:  List[np.ndarray] = []
+        audio_frames: List[np.ndarray] = []
 
-        max_length_of_record_seconds: List[int] = [60, 30]
+        max_length_of_record_seconds: List[int] = [60, 20]
         videos_count: int = 0
         capture_starting_time = time.time()
         start_time = time.time()
@@ -87,11 +88,10 @@ class Camera:
 
         p = pyaudio.PyAudio()
         stream = p.open(format=pyaudio.paInt16,
-                        channels=1,
+                        channels=2,
                         rate=8000,
                         input=True,
                         frames_per_buffer=1024)
-
 
         # Continuously capture images from the camera and run inference
         while cap.isOpened():
@@ -108,7 +108,6 @@ class Camera:
                 frames = frames[1:]
                 audio_frames = audio_frames[1:]
             frames.append(image)
-
 
             # Convert the image from BGR to RGB as required by the TFLite model.
             rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -150,11 +149,11 @@ class Camera:
             if mode == 0:
                 if bottle_detected:
                     print("writing")
-                    video_writer = cv2.VideoWriter('capture_{}.avi'.format(videos_count), fourcc, fps,
+                    video_writer = cv2.VideoWriter('video_capture_{}.avi'.format(videos_count), fourcc, fps,
                                                    (int(cap.get(3)), int(cap.get(4))))
 
                     waveFile = wave.open('audio_capture_{}.wav'.format(videos_count), 'wb')
-                    waveFile.setnchannels(1)
+                    waveFile.setnchannels(2)
                     waveFile.setsampwidth(p.get_sample_size(pyaudio.paInt16))
                     waveFile.setframerate(8000)
 
@@ -182,6 +181,10 @@ class Camera:
                     mode = 0
                     bottle_detected = False
                     capture_starting_time = time.time()
+                    cmd = "ffmpeg -fflags +discardcorrupt -y -ac 2 -channel_layout stereo -i audio_capture_{}.wav -i video_capture_{}.avi -pix_fmt yuv420p capture_{}.avi".format(
+
+                        videos_count, videos_count, videos_count)
+                    subprocess.call(cmd, shell=True)
                     videos_count += 1
 
         stream.stop_stream()
