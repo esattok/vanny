@@ -84,7 +84,7 @@ class Camera:
         # mocking danger detectionn with water bottles :)
         bottle_detected: bool = False
 
-        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        fourcc = cv2.VideoWriter_fourcc(*'MJPG')
 
         p = pyaudio.PyAudio()
         stream = p.open(format=pyaudio.paInt16,
@@ -102,7 +102,7 @@ class Camera:
                 )
 
             counter += 1
-            image = cv2.flip(image, 1)
+            image = cv2.flip(image, 1)#.astype('uint8')
             # keep the size of video as intended
             if len(frames) >= max_length_of_record_seconds[mode] * fps:
                 frames = frames[1:]
