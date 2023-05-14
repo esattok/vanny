@@ -1,15 +1,16 @@
 import subprocess
-import wave
+
 from typing import List
 
 import cv2
 import sys
 import time
-
-import pyaudio  # sudo apt-get install portaudio19-dev  python3-pyaudio
 from tflite_support.task import vision
 import numpy as np
 from tflite_support.task import processor
+
+
+from vannypi.inputmanagement.audiomanager.audio_recorder import AudioRecorder
 
 
 class Camera:
@@ -58,6 +59,12 @@ class Camera:
         return image, bottle_detected  # this will change to be more organized
 
     @staticmethod
+    def mock_event(seconds: int, start_time: float):
+        cur_time = time.time()
+        print(cur_time - start_time)
+        return cur_time - start_time > seconds
+
+    @staticmethod
     def run_camera(detector, height, width, camera_id):
         # Start capturing video input from the camera
         cap = cv2.VideoCapture(camera_id)
@@ -73,9 +80,8 @@ class Camera:
         # Variables to calculate FPS
         counter, fps = 0, fps_avg_frame_count
         frames: List[np.ndarray] = []
-        audio_frames: List[np.ndarray] = []
 
-        max_length_of_record_seconds: List[int] = [60, 20]
+        max_length_of_record_seconds: List[int] = [30, 10]
         videos_count: int = 0
         capture_starting_time = time.time()
         start_time = time.time()
@@ -86,14 +92,11 @@ class Camera:
 
         fourcc = cv2.VideoWriter_fourcc(*'MJPG')
 
-        p = pyaudio.PyAudio()
-        stream = p.open(format=pyaudio.paInt16,
-                        channels=2,
-                        rate=8000,
-                        input=True,
-                        frames_per_buffer=1024)
-
         # Continuously capture images from the camera and run inference
+        audio_recorder = AudioRecorder(main_seconds=max_length_of_record_seconds[0],
+                                       post_incidentt_seconds=max_length_of_record_seconds[1],
+                                       rate=8000, chunk_length=1024)
+        audio_recorder.start_process()
         while cap.isOpened():
             success, image = cap.read()
             if not success:
@@ -102,17 +105,15 @@ class Camera:
                 )
 
             counter += 1
-            image = cv2.flip(image, 1)#.astype('uint8')
+            image = cv2.flip(image, 1)  # .astype('uint8')
             # keep the size of video as intended
             if len(frames) >= max_length_of_record_seconds[mode] * fps:
                 frames = frames[1:]
-                audio_frames = audio_frames[1:]
+
             frames.append(image)
 
             # Convert the image from BGR to RGB as required by the TFLite model.
             rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-            audio_frame = stream.read(1024)
-            audio_frames.append(audio_frame)
 
             # Create a TensorImage object from the RGB image.
             input_tensor = vision.TensorImage.create_from_array(rgb_image)
@@ -152,17 +153,10 @@ class Camera:
                     video_writer = cv2.VideoWriter('video_capture_{}.avi'.format(videos_count), fourcc, fps,
                                                    (int(cap.get(3)), int(cap.get(4))))
 
-                    waveFile = wave.open('audio_capture_{}.wav'.format(videos_count), 'wb')
-                    waveFile.setnchannels(2)
-                    waveFile.setsampwidth(p.get_sample_size(pyaudio.paInt16))
-                    waveFile.setframerate(8000)
-
                     for i in range(len(frames)):
                         video_writer.write(frames[i])
-                    waveFile.writeframes(b''.join(audio_frames))
 
                     frames: List[np.ndarray] = []
-                    audio_frames: List[np.ndarray] = []
 
                     mode = 1
                     bottle_detected = False
@@ -171,33 +165,26 @@ class Camera:
             elif mode == 1:
                 if len(frames) >= fps * max_length_of_record_seconds[mode]:
                     print("writing post")
-                    print(len(frames))
                     for i in range(len(frames)):
                         video_writer.write(frames[i])
-                    waveFile.writeframes(b''.join(audio_frames))
-                    waveFile.close()
+
                     frames: List[np.ndarray] = []
-                    audio_frames: List[np.ndarray] = []
                     mode = 0
                     bottle_detected = False
                     capture_starting_time = time.time()
-                    cmd = "ffmpeg -fflags +discardcorrupt -y -ac 2 -channel_layout stereo -i audio_capture_{}.wav -i video_capture_{}.avi -pix_fmt yuv420p capture_{}.avi".format(
 
+                    import os.path
+                    while not os.path.isfile("audio_capture_{}.wav ".format(videos_count)):
+                        print("audio file not found")
+                        time.sleep(0.1)
+
+                    cmd = "ffmpeg -fflags +discardcorrupt -y -ac 2 -channel_layout stereo -i audio_capture_{}.wav -i video_capture_{}.avi -pix_fmt yuv420p capture_{}.avi".format(
                         videos_count, videos_count, videos_count)
                     subprocess.call(cmd, shell=True)
                     videos_count += 1
 
-        stream.stop_stream()
-        stream.close()
-        p.terminate()
         cap.release()
         cv2.destroyAllWindows()
-
-    @staticmethod
-    def mock_event(seconds: int, start_time: float):
-        cur_time = time.time()
-        print(cur_time - start_time)
-        return cur_time - start_time > seconds
 
 
 '''
