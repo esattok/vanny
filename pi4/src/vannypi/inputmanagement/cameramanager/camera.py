@@ -11,6 +11,7 @@ import numpy as np
 from tflite_support.task import processor
 
 from vannypi.inputmanagement.audiomanager.audio_recorder import AudioRecorder, start_process
+from vannypi.inputmanagement.videomanager.video_encoder import encode
 
 
 class Camera:
@@ -98,13 +99,16 @@ class Camera:
         start_process(main_seconds=max_length_of_record_seconds[0],
                       post_incidentt_seconds=max_length_of_record_seconds[1],
                       rate=48000, chunk_length=4096, mq=audio_recorder_queue)
+
+        frames_count = 0
+        actual_seconds_pre = 0
         while cap.isOpened():
             success, image = cap.read()
             if not success:
                 sys.exit(
                     'ERROR: Unable to read from webcam. Please verify your webcam settings.'
                 )
-
+            frames_count += 1
             counter += 1
             image = cv2.flip(image, 1)  # .astype('uint8')
             # keep the size of video as intended
@@ -154,6 +158,8 @@ class Camera:
             if mode == 0:
                 if bottle_detected:
                     print("writing")
+                    cur_time = time.time()
+                    actual_seconds_pre = int(cur_time - capture_starting_time)
                     video_writer = cv2.VideoWriter('video_capture_{}.avi'.format(videos_count), fourcc, fps,
                                                    (int(cap.get(3)), int(cap.get(4))))
 
@@ -177,16 +183,12 @@ class Camera:
                     bottle_detected = False
                     capture_starting_time = time.time()
 
-                    import os.path
-                    while not os.path.isfile(os.getcwd() + '/' + "audio_capture_{}.wav".format(videos_count)):
-                        print(os.getcwd() + '/' + "audio_capture_{}.wav")
-                        print("audio file not found")
-                        time.sleep(0.1)
-
-                    cmd = "ffmpeg -fflags +discardcorrupt -y -ac 2 -channel_layout stereo -i audio_capture_{}.wav -i video_capture_{}.avi -pix_fmt yuv420p capture_{}.avi".format(
-                        videos_count, videos_count, videos_count)
-                    subprocess.call(cmd, shell=True)
+                    print(frames_count, "fps")
+                    print(actual_seconds_pre + max_length_of_record_seconds[1], "time")
+                    encode(videos_count, frames_count, actual_seconds_pre + max_length_of_record_seconds[1])
                     videos_count += 1
+                    frames_count = 0
+                    actual_seconds_pre = 0
 
         cap.release()
         cv2.destroyAllWindows()
