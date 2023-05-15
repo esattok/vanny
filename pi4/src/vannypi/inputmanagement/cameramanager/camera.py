@@ -1,4 +1,5 @@
 import subprocess
+from multiprocessing import Queue, get_context
 
 from typing import List
 
@@ -9,8 +10,7 @@ from tflite_support.task import vision
 import numpy as np
 from tflite_support.task import processor
 
-
-from vannypi.inputmanagement.audiomanager.audio_recorder import AudioRecorder
+from vannypi.inputmanagement.audiomanager.audio_recorder import AudioRecorder, start_process
 
 
 class Camera:
@@ -93,10 +93,11 @@ class Camera:
         fourcc = cv2.VideoWriter_fourcc(*'MJPG')
 
         # Continuously capture images from the camera and run inference
-        audio_recorder = AudioRecorder(main_seconds=max_length_of_record_seconds[0],
-                                       post_incidentt_seconds=max_length_of_record_seconds[1],
-                                       rate=8000, chunk_length=1024)
-        audio_recorder.start_process()
+        ctx = get_context('spawn')
+        audio_recorder_queue: Queue = ctx.Queue()
+        start_process(main_seconds=max_length_of_record_seconds[0],
+                      post_incidentt_seconds=max_length_of_record_seconds[1],
+                      rate=48000, chunk_length=4096, mq=audio_recorder_queue)
         while cap.isOpened():
             success, image = cap.read()
             if not success:
@@ -123,9 +124,12 @@ class Camera:
 
             # Draw keypoints and edges on input image
             image, detected = Camera.visualize(image, detection_result)
-            if detected:
+            cur_time = time.time()
+            if (cur_time - capture_starting_time > 10 or detected) and mode == 0:
+                # if detected:
                 print("\ndetected")
-                bottle_detected = detected
+                bottle_detected = True
+                audio_recorder_queue.put(True)
 
             # Calculate the FPS
             if counter % fps_avg_frame_count == 0:
@@ -174,7 +178,8 @@ class Camera:
                     capture_starting_time = time.time()
 
                     import os.path
-                    while not os.path.isfile("audio_capture_{}.wav ".format(videos_count)):
+                    while not os.path.isfile(os.getcwd() + '/' + "audio_capture_{}.wav".format(videos_count)):
+                        print(os.getcwd() + '/' + "audio_capture_{}.wav")
                         print("audio file not found")
                         time.sleep(0.1)
 
