@@ -185,7 +185,9 @@ class Camera:
 
                     print(frames_count, "fps")
                     print(actual_seconds_pre + max_length_of_record_seconds[1], "time")
-                    encode(videos_count, frames_count, actual_seconds_pre + max_length_of_record_seconds[1])
+                    encode_process = ctx.Process(target=encode, args=(
+                    videos_count, frames_count, actual_seconds_pre + max_length_of_record_seconds[1],))
+                    encode_process.start()
                     videos_count += 1
                     frames_count = 0
                     actual_seconds_pre = 0
