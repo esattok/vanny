@@ -5,10 +5,6 @@ from typing import List
 import zmq
 
 
-def _import_raw_data(raw_data: List[float]) -> None:
-    pass
-
-
 def server_thread(filename):
     file = open(filename, "rb")
     ctx = zmq.Context()
@@ -63,7 +59,7 @@ def encode(video_count: int, frames_count: int, duration_s: int) -> None:
     print("actual fps", fps)
 
     time.sleep(1)
-    cmd = "ffmpeg -fflags +discardcorrupt -y -ac 2 -r {} -channel_layout stereo -i audio_capture_{}.wav -i video_capture_{}.avi -pix_fmt yuv420p capture_{}.avi".format(
+    cmd = "ffmpeg -fflags +discardcorrupt -y -ac 2 -r {} -channel_layout stereo -i audio_capture_{}.wav -i video_capture_{}.avi  capture_{}.avi".format(
         fps, video_count, video_count, video_count)
     subprocess.run(cmd, shell=True)
     server_thread("capture_{}.avi".format(video_count))
