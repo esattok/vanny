@@ -1,4 +1,4 @@
-import subprocess
+import os
 from multiprocessing import Queue, get_context
 
 from typing import List
@@ -8,69 +8,25 @@ import sys
 import time
 from tflite_support.task import vision
 import numpy as np
-from tflite_support.task import processor
 
-from vannypi.inputmanagement.audiomanager.audio_recorder import AudioRecorder, start_process
+from vannypi.inputanalysis.environmentanalyzer.object_identifier import ObjectsIdentifier
+from vannypi.inputanalysis.objects.toddler import Toddler
+from vannypi.inputmanagement.audiomanager.audio_recorder import start_process
 from vannypi.inputmanagement.videomanager.video_encoder import encode
 
 
 class Camera:
-    def __int__(self):
-        pass
+    def __init__(self):
+        self._toddler = Toddler()
+        self._object_identifier = ObjectsIdentifier()
+        print(self._toddler.report_status())
 
-    @staticmethod
-    def visualize(image: np.ndarray, detection_result: processor.DetectionResult) -> np.ndarray:
-        """Draws bounding boxes on the input image and return it.
-
-        Args:
-          image: The input RGB image.
-          detection_result: The list of all "Detection" entities to be visualize.
-
-        Returns:
-          Image with bounding boxes.
-        """
-        _MARGIN = 10  # pixels
-        _ROW_SIZE = 10  # pixels
-        _FONT_SIZE = 1
-        _FONT_THICKNESS = 1
-        _TEXT_COLOR = (0, 0, 255)  # red
-
-        # mocking danger detectionn with water bottles :)
-        bottle_detected: bool = False
-
-        for detection in detection_result.detections:
-            # Draw bounding_box
-            bbox = detection.bounding_box
-            start_point = bbox.origin_x, bbox.origin_y
-            end_point = bbox.origin_x + bbox.width, bbox.origin_y + bbox.height
-            cv2.rectangle(image, start_point, end_point, _TEXT_COLOR, 3)
-
-            # Draw label and score
-            category = detection.categories[0]
-            category_name = category.category_name
-            if category_name == "bottle":
-                bottle_detected = True
-            probability = round(category.score, 2)
-            result_text = category_name + ' (' + str(probability) + ')'
-            text_location = (_MARGIN + bbox.origin_x,
-                             _MARGIN + _ROW_SIZE + bbox.origin_y)
-            cv2.putText(image, result_text, text_location, cv2.FONT_HERSHEY_PLAIN,
-                        _FONT_SIZE, _TEXT_COLOR, _FONT_THICKNESS)
-
-        return image, bottle_detected  # this will change to be more organized
-
-    @staticmethod
-    def mock_event(seconds: int, start_time: float):
-        cur_time = time.time()
-        print(cur_time - start_time)
-        return cur_time - start_time > seconds
-
-    @staticmethod
-    def run_camera(detector, height, width, camera_id):
+    def run_camera(self, detector, height, width, camera_id):
         # Start capturing video input from the camera
-        cap = cv2.VideoCapture(camera_id)
-        cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
-        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+
+        cap = cv2.VideoCapture('window_slow.mp4') #(camera_id)
+        #cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+        #cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
         # Visualization parameters
         row_size = 20  # pixels
         left_margin = 24  # pixels
@@ -82,7 +38,7 @@ class Camera:
         counter, fps = 0, fps_avg_frame_count
         frames: List[np.ndarray] = []
 
-        max_length_of_record_seconds: List[int] = [30, 10]
+        max_length_of_record_seconds: List[int] = [10, 10]
         videos_count: int = 0
         capture_starting_time = time.time()
         start_time = time.time()
@@ -102,15 +58,25 @@ class Camera:
 
         frames_count = 0
         actual_seconds_pre = 0
+
         while cap.isOpened():
             success, image = cap.read()
             if not success:
-                sys.exit(
-                    'ERROR: Unable to read from webcam. Please verify your webcam settings.'
-                )
+                print("writing post")
+                for i in range(len(frames)):
+                    video_writer.write(frames[i])
+
+                print(frames_count, "fps")
+                print(actual_seconds_pre + max_length_of_record_seconds[1], "time")
+                audio_recorder_queue.put('done')
+                encode(videos_count, frames_count, actual_seconds_pre + max_length_of_record_seconds[1])
+                videos_count += 1
+                print('End of stream.')
+                return
+
             frames_count += 1
             counter += 1
-            image = cv2.flip(image, 1)  # .astype('uint8')
+            #image = cv2.flip(image, 1)  # .astype('uint8')
             # keep the size of video as intended
             if len(frames) >= max_length_of_record_seconds[mode] * fps:
                 frames = frames[1:]
@@ -127,9 +93,12 @@ class Camera:
             detection_result = detector.detect(input_tensor)
 
             # Draw keypoints and edges on input image
-            image, detected = Camera.visualize(image, detection_result)
+            image, detected_objects = self._object_identifier.visualize(image, detection_result)
+            self._toddler.update(detected=('baby' in detected_objects))
+            print(self._toddler.report_status())
+
             cur_time = time.time()
-            if (cur_time - capture_starting_time > 10 or detected) and mode == 0:
+            if (cur_time - capture_starting_time > 5) and mode == 0:
                 # if detected:
                 print("\ndetected")
                 bottle_detected = True
@@ -157,6 +126,7 @@ class Camera:
 
             if mode == 0:
                 if bottle_detected:
+                    os.system('clear')
                     print("writing")
                     cur_time = time.time()
                     actual_seconds_pre = int(cur_time - capture_starting_time)
@@ -167,7 +137,6 @@ class Camera:
                         video_writer.write(frames[i])
 
                     frames: List[np.ndarray] = []
-
                     mode = 1
                     bottle_detected = False
                     capture_starting_time = time.time()
@@ -186,7 +155,7 @@ class Camera:
                     print(frames_count, "fps")
                     print(actual_seconds_pre + max_length_of_record_seconds[1], "time")
                     encode_process = ctx.Process(target=encode, args=(
-                    videos_count, frames_count, actual_seconds_pre + max_length_of_record_seconds[1],))
+                        videos_count, frames_count, actual_seconds_pre + max_length_of_record_seconds[1],))
                     encode_process.start()
                     videos_count += 1
                     frames_count = 0
@@ -194,6 +163,8 @@ class Camera:
 
         cap.release()
         cv2.destroyAllWindows()
+
+
 
 
 '''

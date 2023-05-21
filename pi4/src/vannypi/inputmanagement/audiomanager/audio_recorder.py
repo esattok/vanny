@@ -1,12 +1,9 @@
 import wave
-from multiprocessing import Queue, Process, set_start_method, get_context
+from multiprocessing import Queue, get_context
 
 from typing import ByteString, Union, Iterable
 
-import numpy as np
 import pyaudio  # sudo apt-get install portaudio19-dev  python3-pyaudio
-
-from vannypi.inputmanagement.audiomanager.audio import Audio
 
 
 class AudioRecorder:
@@ -39,6 +36,8 @@ class AudioRecorder:
     def _change_mode(self):
         if not self._mq.empty():
             detected = self._mq.get_nowait()
+            if detected == 'done':
+                return None
             print("audio changing mode")
             return True
         return False
@@ -52,7 +51,11 @@ class AudioRecorder:
             audio_frame = self.stream.read(self._chunk_length)
             self._audio_frames.append(audio_frame)
 
-            if self._mode == 0 and self._change_mode():
+            mode_change = self._change_mode()
+            if mode_change is None:
+                self.save_audio(mode=1)
+                return
+            if self._mode == 0 and mode_change:
                 self.save_audio(mode=self._mode)
 
                 recording_seconds = self._post_incident_seconds
@@ -63,12 +66,11 @@ class AudioRecorder:
                 self.save_audio(mode=1)
 
     def save_audio(self, mode: int) -> None:
+        self._waveFile = wave.open('audio_capture_{}.wav'.format(self._files_count), 'wb')
+        self._waveFile.setnchannels(2)
+        self._waveFile.setsampwidth(self.p.get_sample_size(pyaudio.paInt16))
+        self._waveFile.setframerate(self._rate)
         if mode == 0:
-            self._waveFile = wave.open('audio_capture_{}.wav'.format(self._files_count), 'wb')
-            self._waveFile.setnchannels(2)
-            self._waveFile.setsampwidth(self.p.get_sample_size(pyaudio.paInt16))
-            self._waveFile.setframerate(self._rate)
-
             self._waveFile.writeframes(b''.join(self._audio_frames))
             self._audio_frames: Iterable[Union[ByteString, memoryview]] = []
             self._mode = 1
