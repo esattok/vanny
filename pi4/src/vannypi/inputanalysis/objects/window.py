@@ -1,11 +1,22 @@
 from typing import List
 
-from vannypi.inputanalysis.objects.object import Object
 
+class Window:
+    def __init__(self):
+        self.detected: bool = False
+        self._count: int = 0
+        self._THRESHOLD: int = 6
 
-class Window(Object):
-    def __int__(self):
-        self.distance_from_toddler: float = 0.
-        self.dangerous: bool = True
-        self.size: List[float] = [0., 0.]
-        self.open: bool = True
+    def update(self, names: List[str]):
+        if 'window' in names:
+            if self._count < self._THRESHOLD:
+                self._count += 1
+
+            if self._count == self._THRESHOLD and not self.detected:
+                self.detected = True
+
+        else:
+            self._count -= 1
+
+            if self._count == 0:
+                self.detected = False
