@@ -51,12 +51,6 @@ class ObjectsIdentifier:
         self._window.update(detections)
         self._door.update(detections)
         self._toddler.update(detected=('baby' in detections))
-        print(self._toddler.report_status())
-
-        print("sharp objs", self._sharp_objects.in_room)
-        print("fire", self._fire.detected)
-        print("door", self._door.detected)
-        print("window", self._window.detected)
 
     def detected_text(self):
         sharp_objects = "" if len(self._sharp_objects.in_room) == 0 else "- Sharp objects detected: " + str(
@@ -70,7 +64,13 @@ class ObjectsIdentifier:
             self._toddler.report_status(), fire_text, sharp_objects, door_text, window_text)
         return detections
 
-    def visualize(self, image: np.ndarray, detection_result: processor.DetectionResult) -> ndarray:
+    @staticmethod
+    def decide_if_reporting_necessary(detections):
+
+        return ("NOT IN ROOM!" in detections) or (" - FIRE!!" in detections) or ("Sharp objects detected:" in
+                                                                                 detections)
+
+    def visualize(self, image: np.ndarray, detection_result: processor.DetectionResult) -> Tuple[ndarray, bool]:
         """Draws bounding boxes on the input image and return it.
 
         Args:
@@ -94,20 +94,21 @@ class ObjectsIdentifier:
             bbox = detection.bounding_box
             start_point = bbox.origin_x, bbox.origin_y
             end_point = bbox.origin_x + bbox.width, bbox.origin_y + bbox.height
-            cv2.rectangle(image, start_point, end_point, _TEXT_COLOR, 3)
+            #cv2.rectangle(image, start_point, end_point, _TEXT_COLOR, 3)
 
             # Draw label and score
             category = detection.categories[0]
             category_name = category.category_name
 
             detected_objects.append(category_name)
-
+            '''
             probability = round(category.score, 2)
             result_text = category_name + ' (' + str(probability) + ')'
             text_location = (_MARGIN + bbox.origin_x,
                              _MARGIN + _ROW_SIZE + bbox.origin_y)
             cv2.putText(image, result_text, text_location, cv2.FONT_HERSHEY_PLAIN,
                         _FONT_SIZE, _TEXT_COLOR, _FONT_THICKNESS)
+            '''
 
         self.update_detections(detected_objects)
 
@@ -117,6 +118,8 @@ class ObjectsIdentifier:
         bottomLeftCornerOfText = (10, 500)
 
         text_location = (left_margin, top_margin)
-        cv2.putText(image, self.detected_text(), text_location, cv2.FONT_HERSHEY_COMPLEX_SMALL,
-                    _FONT_SIZE, (0, 0, 0), _FONT_THICKNESS + 1)
-        return image
+        text = self.detected_text()
+
+        cv2.putText(image, text, text_location, cv2.FONT_HERSHEY_COMPLEX_SMALL,
+                    _FONT_SIZE, (0, 0, 255), _FONT_THICKNESS + 1)
+        return image, self.decide_if_reporting_necessary(text)
