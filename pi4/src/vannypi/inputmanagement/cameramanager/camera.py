@@ -25,7 +25,7 @@ class Camera:
     def run_camera(self, detector, height, width, camera_id):
         # Start capturing video input from the camera
 
-        cap = cv2.VideoCapture('door_fps.mp4') #(camera_id)
+        cap = cv2.VideoCapture('fire_fps.mp4') #(camera_id)
         #cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
         #cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
         # Visualization parameters

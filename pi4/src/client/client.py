@@ -34,30 +34,39 @@ class Client:
         cv2.destroyAllWindows()
 
 
-def reporter():
+def cont_reporting():
+    client = Client()
+
+    while True:
+        reporter(client)
+        client.reports_count += 1
+
+
+def reporter(client):
     print("reporter on")
 
-    cli = Client()
-    dealer = cli.ctx.socket(zmq.DEALER)
+    dealer = client.ctx.socket(zmq.DEALER)
     dealer.connect("tcp://127.0.0.1:6000")
 
-    credit = cli.PIPELINE  # Up to PIPELINE chunks in transit
+    credit = client.PIPELINE  # Up to PIPELINE chunks in transit
 
     total = 0  # Total bytes received
     chunks = 0  # Total chunks received
     offset = 0  # Offset of next chunk request
     count = 0
-    f = open("report_{}.mp4".format(cli.reports_count), 'wb+')
+    f = open("report_{}.mp4".format(client.reports_count), 'wb+')
+
+    print("before loop")
     while True:
         while credit:
             # ask for next chunk
             dealer.send_multipart([
                 b"fetch",
                 b"%i" % offset,
-                b"%i" % cli.CHUNK_SIZE,
+                b"%i" % client.CHUNK_SIZE,
             ])
 
-            offset += cli.CHUNK_SIZE
+            offset += client.CHUNK_SIZE
             credit -= 1
 
         try:
@@ -74,19 +83,18 @@ def reporter():
         f.write(chunk)
         total += size
 
-        if size < cli.CHUNK_SIZE:
-            break  # Last chunk received; exit
-    cli.reports_count += 1
+        if size < client.CHUNK_SIZE:
+            break
+
+    client.reports_count += 1
     f.close()
-    # pipe.send(b"OK")
     print("%i chunks received, %i bytes" % (chunks, total))
     print("done cli")
 
 
 if __name__ == '__main__':
     print("re")
-    report_process = Process(target=reporter, args=())
+    report_process = Process(target=cont_reporting, args=())
     report_process.start()
     cli = Client()
     cli.display_stream()
-
