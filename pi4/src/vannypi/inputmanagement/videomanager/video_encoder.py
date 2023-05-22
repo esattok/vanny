@@ -1,7 +1,6 @@
 import os
 import subprocess
 import time
-from typing import List
 import zmq
 
 
