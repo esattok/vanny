@@ -7,6 +7,7 @@ from numpy import ndarray
 from vannypi.inputanalysis.objects.door import Door
 from vannypi.inputanalysis.objects.fire import Fire
 from vannypi.inputanalysis.objects.sharp_object import SharpObjects
+from vannypi.inputanalysis.objects.toddler import Toddler
 from vannypi.inputanalysis.objects.window import Window
 from vannypi.inputmanagement.videomanager.video import Video
 
@@ -17,12 +18,14 @@ from tflite_support.task import vision
 
 class ObjectsIdentifier:
     def __init__(self):
+        self._toddler = Toddler()
         self._sharp_objects = SharpObjects()
         self._fire = Fire()
         self._door = Door()
         self._window = Window()
 
         return
+
     @staticmethod
     def digest_models(model, num_threads, enable_edgetpu) -> core.BaseOptions:
         # Initialize the object detection model
@@ -47,14 +50,27 @@ class ObjectsIdentifier:
         self._fire.update(detections)
         self._window.update(detections)
         self._door.update(detections)
+        self._toddler.update(detected=('baby' in detections))
+        print(self._toddler.report_status())
 
         print("sharp objs", self._sharp_objects.in_room)
         print("fire", self._fire.detected)
         print("door", self._door.detected)
         print("window", self._window.detected)
 
+    def detected_text(self):
+        sharp_objects = "" if len(self._sharp_objects.in_room) == 0 else "- Sharp objects detected: " + str(
+            self._sharp_objects.in_room) + " "
 
-    def visualize(self, image: np.ndarray, detection_result: processor.DetectionResult) -> Tuple[ndarray, List[str]]:
+        fire_text = "" if not self._fire.detected else " - FIRE!!"
+        door_text = "" if not self._door.detected else " - close to door "
+        window_text = "" if not self._window.detected else " - close to window "
+
+        detections = "Toddler: {}{}{}{}{}".format(
+            self._toddler.report_status(), fire_text, sharp_objects, door_text, window_text)
+        return detections
+
+    def visualize(self, image: np.ndarray, detection_result: processor.DetectionResult) -> ndarray:
         """Draws bounding boxes on the input image and return it.
 
         Args:
@@ -94,4 +110,13 @@ class ObjectsIdentifier:
                         _FONT_SIZE, _TEXT_COLOR, _FONT_THICKNESS)
 
         self.update_detections(detected_objects)
-        return image, detected_objects
+
+        row_size = 20  # pixels
+        left_margin = 24  # pixels
+        top_margin = 45
+        bottomLeftCornerOfText = (10, 500)
+
+        text_location = (left_margin, top_margin)
+        cv2.putText(image, self.detected_text(), text_location, cv2.FONT_HERSHEY_COMPLEX_SMALL,
+                    _FONT_SIZE, (0, 0, 0), _FONT_THICKNESS + 1)
+        return image

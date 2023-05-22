@@ -32,9 +32,9 @@ class Toddler:
 
     def report_status(self):
         if self._in_room:
-            return "in room"
+            return "IN ROOM"
         elif not self._in_room:
             if not self._detected:
-                return "not detected"
+                return "NOT DETECTED"
             elif self._detected:
                 return "NOT IN ROOM!"

@@ -93,9 +93,8 @@ class Camera:
             detection_result = detector.detect(input_tensor)
 
             # Draw keypoints and edges on input image
-            image, detected_objects = self._object_identifier.visualize(image, detection_result)
-            self._toddler.update(detected=('baby' in detected_objects))
-            print(self._toddler.report_status())
+            image = self._object_identifier.visualize(image, detection_result)
+
 
             cur_time = time.time()
             if (cur_time - capture_starting_time > 5) and mode == 0:

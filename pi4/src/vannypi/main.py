@@ -16,9 +16,11 @@ def run(model: str, camera_id: int, width: int, height: int, num_threads: int,
       num_threads: The number of CPU threads to run the model.
       enable_edgetpu: True/False whether the model is a EdgeTPU model.
     """
+    cam = Camera()
+
     model_options = ObjectsIdentifier.digest_models(model, num_threads, enable_edgetpu)
-    detector = ObjectsIdentifier.detect_objects(model_options)
-    Camera.run_camera(detector, height, width, camera_id)
+    detector = ObjectsIdentifier.setup_detector(model_options)
+    cam.run_camera(detector, height, width, camera_id)
 
 
 if __name__ == '__main__':
