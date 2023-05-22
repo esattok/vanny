@@ -9,6 +9,7 @@ import time
 from tflite_support.task import vision
 import numpy as np
 
+from vannypi.communicator.streammanager.streamer import start_streaming_process
 from vannypi.inputanalysis.environmentanalyzer.object_identifier import ObjectsIdentifier
 from vannypi.inputanalysis.objects.toddler import Toddler
 from vannypi.inputmanagement.audiomanager.audio_recorder import start_process
@@ -24,7 +25,7 @@ class Camera:
     def run_camera(self, detector, height, width, camera_id):
         # Start capturing video input from the camera
 
-        cap = cv2.VideoCapture('window_slow.mp4') #(camera_id)
+        cap = cv2.VideoCapture('door_fps.mp4') #(camera_id)
         #cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
         #cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
         # Visualization parameters
@@ -38,7 +39,7 @@ class Camera:
         counter, fps = 0, fps_avg_frame_count
         frames: List[np.ndarray] = []
 
-        max_length_of_record_seconds: List[int] = [10, 10]
+        max_length_of_record_seconds: List[int] = [20, 10]
         videos_count: int = 0
         capture_starting_time = time.time()
         start_time = time.time()
@@ -56,8 +57,14 @@ class Camera:
                       post_incidentt_seconds=max_length_of_record_seconds[1],
                       rate=48000, chunk_length=4096, mq=audio_recorder_queue)
 
+        streamer_queue: Queue = Queue()
+        start_streaming_process(streamer_queue)
+
         frames_count = 0
         actual_seconds_pre = 0
+
+        video_writer = cv2.VideoWriter('video_capture_{}.avi'.format(videos_count), fourcc, fps,
+                                       (int(cap.get(3)), int(cap.get(4))))
 
         while cap.isOpened():
             success, image = cap.read()
@@ -72,6 +79,7 @@ class Camera:
                 encode(videos_count, frames_count, actual_seconds_pre + max_length_of_record_seconds[1])
                 videos_count += 1
                 print('End of stream.')
+                streamer_queue.put("None")
                 return
 
             frames_count += 1
@@ -93,14 +101,11 @@ class Camera:
             detection_result = detector.detect(input_tensor)
 
             # Draw keypoints and edges on input image
-            image = self._object_identifier.visualize(image, detection_result)
+            image, detected = self._object_identifier.visualize(image, detection_result)
 
 
             cur_time = time.time()
-            if (cur_time - capture_starting_time > 5) and mode == 0:
-                # if detected:
-                print("\ndetected")
-                bottle_detected = True
+            if detected and mode == 0:
                 audio_recorder_queue.put(True)
 
             # Calculate the FPS
@@ -116,16 +121,17 @@ class Camera:
                         font_size, text_color, font_thickness)
 
             # Stop the program if the ESC key is pressed.
-            if cv2.waitKey(1) == 27:
-                break
-            cv2.imshow('object_detector', image)
+            #if cv2.waitKey(1) == 27:
+            #    break
+            #cv2.imshow('object_detector', image)
+            streamer_queue.put(image)
 
-            cur_time = time.time()
-            print(cur_time - capture_starting_time)
+            l_time = cur_time
+            if (cur_time - l_time) > 1:
+                print(cur_time - capture_starting_time)
 
             if mode == 0:
-                if bottle_detected:
-                    os.system('clear')
+                if detected:
                     print("writing")
                     cur_time = time.time()
                     actual_seconds_pre = int(cur_time - capture_starting_time)
@@ -161,7 +167,7 @@ class Camera:
                     actual_seconds_pre = 0
 
         cap.release()
-        cv2.destroyAllWindows()
+        #cv2.destroyAllWindows()
 
 
 
