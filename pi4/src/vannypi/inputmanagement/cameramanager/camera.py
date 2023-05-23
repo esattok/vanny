@@ -25,7 +25,7 @@ class Camera:
     def run_camera(self, detector, height, width, camera_id):
         # Start capturing video input from the camera
 
-        cap = cv2.VideoCapture('fire_fps.mp4') #(camera_id)
+        cap = cv2.VideoCapture('door_fps.mp4') #(camera_id)
         #cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
         #cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
         # Visualization parameters
@@ -69,7 +69,7 @@ class Camera:
         while cap.isOpened():
             success, image = cap.read()
             if not success:
-                print("writing post")
+                print("END OF STREAM : writing post")
                 for i in range(len(frames)):
                     video_writer.write(frames[i])
 
@@ -105,6 +105,7 @@ class Camera:
 
 
             cur_time = time.time()
+
             if detected and mode == 0:
                 audio_recorder_queue.put(True)
 
@@ -121,9 +122,9 @@ class Camera:
                         font_size, text_color, font_thickness)
 
             # Stop the program if the ESC key is pressed.
-            #if cv2.waitKey(1) == 27:
-            #    break
-            #cv2.imshow('object_detector', image)
+            if cv2.waitKey(1) == 27:
+                break
+            cv2.imshow('object_detector', image)
             streamer_queue.put(image)
 
             l_time = cur_time

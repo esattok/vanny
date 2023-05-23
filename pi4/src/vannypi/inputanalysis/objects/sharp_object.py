@@ -5,7 +5,7 @@ class SharpObjects:
     def __init__(self):
         self._detected: Dict[str, int] = {'scissor': 0, 'knife': 0, 'pen': 0}
         self.in_room: List[str] = []
-        self._THRESHOLD: int = 6
+        self._THRESHOLD: int = 4
 
     def update(self, names: List[str]):
         for object_name in self._detected.keys():

@@ -14,7 +14,7 @@ class Streamer:
     def __init__(self):
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.PUB)
-        self.socket.bind("tcp://*:5555")
+        self.socket.bind("tcp://139.179.223.142:5555")
 
 
 def stream(mq: Queue) -> None:

@@ -8,7 +8,7 @@ def server_thread(filename):
     file = open(filename, "rb")
     ctx = zmq.Context()
     router = ctx.socket(zmq.ROUTER)
-    router.bind("tcp://*:6000")
+    router.bind("tcp://139.179.223.142:6004")
     print("Server")
 
     while True:
